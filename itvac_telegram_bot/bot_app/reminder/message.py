@@ -1,7 +1,6 @@
-from django.conf import settings
-import requests
+import requests, os
 
-token = settings.TOKEN
+token = os.environ.get('TOKEN')
 base_url = "https://api.telegram.org/bot{}/".format(token)
 
 

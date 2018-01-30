@@ -1,6 +1,6 @@
 from vacancies import get_new_vacancies
 from message import send_message
-from reminder.db_reminder import UserModel
+from db_reminder import UserModel
 import json
 import os
 import time
