@@ -12,6 +12,11 @@ def send_reminder():
     # Get vacancies for the last day
     data = get_new_vacancies()
     new_data = compare_data(data)
+    if new_data:
+        # Saving all sent vacancies
+        with open('last_sent_reminder.json', 'w') as outfile:
+            json.dump(new_data, outfile, indent=4, ensure_ascii=False)
+    # Sending vacancies
     for user in user_list:
         count = len(new_data)
         send_message(chat_id=user,
@@ -38,9 +43,6 @@ def send_reminder():
                                     "" + vacancy['url'] + ' '
                              )
                 count -= 1
-    # Saving all sent vacancies
-    with open('last_sent_reminder.json', 'w') as outfile:
-        json.dump(new_data, outfile, indent=4, ensure_ascii=False)
 
 
 def compare_data(new_data):
