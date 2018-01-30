@@ -7,6 +7,8 @@ Then, it calls compare_data() method to compare new and last sent data. And retu
 If filtered data is not empty, the alert will be sent to the users.
 The filtered data will be written to last_sent_vacancies.json file.
 
+last_sent_vacancies.json file will be created after first run send_alert.py module
+
 """
 
 from vacancies import get_new_vacancies
@@ -66,7 +68,7 @@ def send_alert():
 
 # Method for comparing new data to last sent
 def compare_data(new_data):
-    with open('last_sent_vacancies.json', 'r+') as f:
+    with open('last_sent_vacancies.json', 'w') as f:  # Opening file in w mode prevents error when file doesn't exist
         if not os.stat("last_sent_vacancies.json").st_size:
             return new_data
         else:
