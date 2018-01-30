@@ -1,3 +1,13 @@
+"""
+This module parses data from websites.
+To add new website or edit existing one, create/edit __WebsiteName Class and its methods.
+You need to set new url to parse new website.
+Each website has its own structure. So, each website parsing is unique.
+
+Use get_new_vacancies() method to get parsed data.
+get_random_vacancy() method returns a random data from get_new_vacancies().
+"""
+
 import requests
 import random
 from bs4 import BeautifulSoup
@@ -7,15 +17,18 @@ def get_new_vacancies():
     rabota_az = __RabotaAz()
     day_az = __DayAz()
     boss_az = __BossAz()
+    # Sum of all vacancies available
     vacancies = rabota_az.vacancies() + day_az.vacancies() + boss_az.vacancies()
     return vacancies
 
 
 def get_random_vacancy():
     websites = [__RabotaAz, __DayAz, __BossAz]
+    # Get a random website and parse vacancies from there
     random_website = random.choice(websites)
     random_website = random_website()
     vacancies = [random_website.random()]
+    # Get random vacancy
     random_vacancy = random.choice(vacancies)
     return random_vacancy
 
@@ -126,7 +139,7 @@ class __BossAz:
     url = "https://boss.az/vacancies?search%5Bcategory_id%5D=38"
     base_url = "https://boss.az"
 
-    def vacancies(self, url=url, count=4):  # count = How many vacancies to parse
+    def vacancies(self, url=url, count=2):  # count = How many vacancies to parse
         page = requests.get(url, headers={'User-agent': self.user_agent})
         if page.status_code == 200:
             soup = BeautifulSoup(page.content, 'lxml')

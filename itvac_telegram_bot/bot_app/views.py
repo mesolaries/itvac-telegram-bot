@@ -7,17 +7,16 @@ from django.db import IntegrityError
 import re
 import json
 
-from bot_app.models import User, Reminder
-from bot_app.reminder.vacancies import get_random_vacancy
-from bot_app.reminder.message import send_message
+from bot_app.models import User, Alert
+from bot_app.alert.vacancies import get_random_vacancy
+from bot_app.alert.message import send_message
 
 
-# Handlers
+# Add your handlers here
 def start(chat_id, username):
     response = send_message(chat_id,
                             text="Hi! I'm IT Vacancies Bot.\n"
-                                 "I'll send you updates about new IT vacancies available on the a web twice a day.\n"
-                                 "Send _/cancel_ to stop receiving the updates."
+                                 "I'll send you updates about new IT vacancies available on the web twice a day."
                             )
     try:
         # Create object if doesn't exist. Update username if changed.
@@ -26,7 +25,7 @@ def start(chat_id, username):
         pass
     finally:
         try:
-            Reminder.objects.create(chat_id=chat_id)
+            Alert.objects.create(chat_id=chat_id)
         except IntegrityError:
             pass
     return response
@@ -52,20 +51,19 @@ def vacancy(chat_id, message_id):
                      )
 
 
-def reminder(chat_id, message_id, username):
+def set_alert(chat_id, message_id, username):
     try:
-        Reminder.objects.create(chat_id=chat_id)
+        Alert.objects.create(chat_id=chat_id)
         send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You've subscribed to vacancy updates.\n"
-                          "Now, you'll get all new vacancies available on the web twice a day.\n"
-                          "Send _/cancel_, if you want to unsubscribe."
+                          "Now, you'll get all new vacancies available on the web twice a day."
                      )
     except IntegrityError:
         send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You already subscribed to vacancy updates.\n"
-                          "Send _/cancel_ to unsubscribe."
+                          "Send /unsetalert if you want to unsubscribe."
                      )
     finally:
         try:
@@ -73,30 +71,33 @@ def reminder(chat_id, message_id, username):
         except IntegrityError:
             pass
 
+
 def help(chat_id, message_id):
     message = send_message(chat_id=chat_id,
-                 reply_to_message_id=message_id,
-                 text="*How to use IT Vacancies bot?\n\n*"
-                      "*This bot connects to popular vacancy websites and parses all new IT vacancies available.\n"
-                      "So, you don't have to manually check websites every time.\n\n*"
-                      "Here're the control commands of the bot:\n"
-                      "/start - Starts the bot and automatically subscribe you to the twice-daily vacancy updates.\n"
-                      "/vacancy - Get 1 random vacancy from all available vacancies for the past week.\n"
-                      "/reminder - Subscribe to the twice-daily vacancy updates. So, you'll get all new vacancies available every 12 hours.\n"
-                      "/cancel - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
-                      "/help - You'll get this help message.\n\n"
-                      "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
-                      "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot"
+                             reply_to_message_id=message_id,
+                             text="*How to use IT Vacancies bot?\n\n*"
+                                  "*This bot connects to popular vacancy websites and parses all new IT vacancies available.\n"
+                                  "So, you don't have to manually check websites every time.\n\n*"
+                                  "Here are the control commands of the bot:\n"
+                                  "/start - Starts the bot and automatically subscribe you to the twice-daily vacancy updates.\n"
+                                  "/vacancy - Get a random vacancy from all available vacancies for the past week.\n"
+                                  "/setalert - Subscribe to the twice-daily vacancy updates. So, you'll get all new vacancies available every 12 hours.\n"
+                                  "/unsetalert - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
+                                  "/help - You'll get this help message.\n\n"
+                                  "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
+                                  "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot"
                  )
     return message
 
-def cancel(chat_id, message_id):
+
+def unset_alert(chat_id, message_id):
     try:
-        Reminder.objects.filter(chat_id=chat_id).delete()
+        Alert.objects.filter(chat_id=chat_id).delete()
         send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You've unsubscribed from vacancy updates.\n"
-                          "Send _/reminder_ to resubscribe."
+                          "You'll no longer get alerts about new vacancies available.\n"
+                          "Send /setalert if you want to get them again."
                      )
     except:
         pass
@@ -127,10 +128,10 @@ class CommandReceiveView(View):
             start(chat_id, username)
         elif command == '/vacancy':
             vacancy(chat_id, message_id)
-        elif command == '/cancel':
-            cancel(chat_id, message_id)
-        elif command == '/reminder':
-            reminder(chat_id, message_id, username)
+        elif command == '/unsetalert':
+            unset_alert(chat_id, message_id)
+        elif command == '/setalert':
+            set_alert(chat_id, message_id, username)
         elif command == '/help':
             help(chat_id, message_id)
 
