@@ -1,6 +1,7 @@
 .idea/
 db.sqlite3
 last_sent_vacancies.json
+channel_alerts/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

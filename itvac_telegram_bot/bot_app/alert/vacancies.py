@@ -50,7 +50,7 @@ class __RabotaAz:
             data = {'results': []}
             try:
                 vacancies = soup.find('ul', {'class': 'visitor-vacancy-list'}).find_all('li')[
-                            ::1]  # Newest vacancy comes last
+                            ::-1]  # Newest vacancy comes last
             except AttributeError:
                 return data['results']
             for vacancy in vacancies:
@@ -99,7 +99,7 @@ class __DayAz:
             data = {'results': []}
             try:
                 vacancies = soup.find('div', {'class': 'vacancy-serp'}).find_all('div', {'class': 'vacancy-serp-item'})[
-                            ::1]  # Newest vacancy comes last
+                            ::-1]  # Newest vacancy comes last
             except AttributeError:
                 return data['results']
             for vacancy in vacancies:
@@ -143,10 +143,13 @@ class __BossAz:
         page = requests.get(url, headers={'User-agent': self.user_agent})
         if page.status_code == 200:
             soup = BeautifulSoup(page.content, 'lxml')
-            vacancies = soup.find_all('div', {'class': 'results-i'})
             data = {'results': []}
-            if len(vacancies) >= count:
-                vacancies = vacancies[:count]
+            try:
+                vacancies = soup.find_all('div', {'class': 'results-i'})[::-1]
+                if len(vacancies) >= count:
+                    vacancies = vacancies[:count]
+            except AttributeError:
+                return data['results']
             for vacancy in vacancies:
                 title = vacancy.h3.get_text()
                 salary = vacancy.find('div', {'class': 'results-i-salary'}).get_text()

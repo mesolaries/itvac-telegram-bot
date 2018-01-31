@@ -28,7 +28,7 @@ def send_alert():
     new_data = compare_data(data)
     if new_data:
         # Saving all sent vacancies
-        with open('last_sent_vacancies.json', 'w') as outfile:
+        with open('last_sent_vacancies.json', 'w+') as outfile:
             json.dump(new_data, outfile, indent=4, ensure_ascii=False)
     # Sending vacancies
     for user in user_list:
@@ -68,7 +68,7 @@ def send_alert():
 
 # Method for comparing new data to last sent
 def compare_data(new_data):
-    with open('last_sent_vacancies.json', 'w') as f:  # Opening file in w mode prevents error when file doesn't exist
+    with open('last_sent_vacancies.json', 'r+') as f:  # Opening file in w mode prevents error when file doesn't exist
         if not os.stat("last_sent_vacancies.json").st_size:
             return new_data
         else:
