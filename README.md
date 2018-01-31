@@ -25,3 +25,5 @@ Then, parse data in `vacancies()` method using [BeautifulSoup4](https://pypi.pyt
 ___
 
 Contact IT Vacancies bot: https://t.me/itvac_bot
+
+Join my IT Vacancies channel: https://t.me/it_vacancies
