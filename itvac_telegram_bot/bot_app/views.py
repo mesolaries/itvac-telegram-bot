@@ -93,7 +93,7 @@ def help(chat_id, message_id):
                                   "/unsetalert - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
                                   "/help - You'll get this help message.\n\n"
                                   "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
-                                  "*Join the channel:* @it_vacancies"
+                                  "*Join the channel:* [@it_vacancies](tg://user?id=@it_vacancies)\n"
                                   "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot"
                  )
     return message
