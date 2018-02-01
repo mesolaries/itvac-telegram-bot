@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
 from datetime import datetime
+from json.decoder import JSONDecodeError
 import re
 import json
 import time
@@ -143,16 +144,22 @@ class CommandReceiveView(View):
             elif command == '/help':
                 help(chat_id, message_id)
         except:
+            current_time = datetime.now().strftime("%I:%M%p on %B %d, %Y")
+            tb = traceback.format_exc().replace('\n', ' ')
+            error_data = {
+                'time': current_time,
+                'request': str(json.loads(request.read().decode('utf-8'))),
+                'error': tb
+            }
             path = os.path.dirname(os.path.realpath(__file__))
-            with open(path + "/logs/caught_exceptions.log", 'a') as log:
-                current_time = datetime.now().strftime("%I:%M%p on %B %d, %Y")
-                tb = traceback.format_exc().replace('\n', ' ')
-                error_data = {
-                    'time': current_time,
-                    'request': json.loads(request.read().decode('utf-8')),
-                    'error': tb
-                }
-                json.dump(str(error_data) + ',', log, indent=4, ensure_ascii=False)
+            with open(path + "/logs/caught_exceptions.log", 'r+') as log:
+                try:  # If file is not empty
+                    current_log = json.load(log)
+                    current_log.append(error_data)
+                    with open(path + "/logs/caught_exceptions.log", 'w+') as f:
+                        json.dump(current_log, f, indent=4, ensure_ascii=False)
+                except JSONDecodeError:  # If file is empty
+                    json.dump([error_data], log, indent=4, ensure_ascii=False)
         finally:
             time.sleep(1)  # Wait a sec before end this request and start a new one
             return HttpResponse(status=200)
