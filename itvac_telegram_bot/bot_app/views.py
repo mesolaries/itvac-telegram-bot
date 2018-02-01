@@ -4,8 +4,12 @@ from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
+from datetime import datetime
 import re
 import json
+import time
+import traceback
+import os
 
 from bot_app.models import User, Alert
 from bot_app.alert.vacancies import get_random_vacancy
@@ -14,7 +18,7 @@ from bot_app.alert.message import send_message
 
 # Add your handlers here
 def start(chat_id, username):
-    response = send_message(chat_id,
+    message = send_message(chat_id,
                             text="Hi! I'm IT Vacancies Bot.\n"
                                  "I'll send you updates about new IT vacancies available on the web twice a day."
                             )
@@ -28,19 +32,19 @@ def start(chat_id, username):
             Alert.objects.create(chat_id=chat_id)
         except IntegrityError:
             pass
-    return response
+    return message
 
 
 def vacancy(chat_id, message_id):
     vac = get_random_vacancy()
     if len(vac) == 0:
-        send_message(chat_id,
+        message = send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="Sorry. No vacancies available for now...\n"
                           "Please, try again later."
                      )
     else:
-        send_message(chat_id,
+        message = send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="*Job title: *" + vac['title'] + '\n'
                             "*Location: *" + vac['location'] + '\n'
@@ -49,18 +53,19 @@ def vacancy(chat_id, message_id):
                             "*Overview: *\n" + vac['overview'] + '\n\n'
                             "" + vac['url'] + ' '
                      )
+    return message
 
 
 def set_alert(chat_id, message_id, username):
     try:
         Alert.objects.create(chat_id=chat_id)
-        send_message(chat_id,
+        message = send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You've subscribed to vacancy updates.\n"
                           "Now, you'll get all new vacancies available on the web twice a day."
                      )
     except IntegrityError:
-        send_message(chat_id,
+        message = send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You already subscribed to vacancy updates.\n"
                           "Send /unsetalert if you want to unsubscribe."
@@ -70,6 +75,7 @@ def set_alert(chat_id, message_id, username):
             User.objects.update_or_create(chat_id=chat_id, defaults={'username': username})
         except IntegrityError:
             pass
+    return message
 
 
 def help(chat_id, message_id):
@@ -93,14 +99,15 @@ def help(chat_id, message_id):
 def unset_alert(chat_id, message_id):
     try:
         Alert.objects.filter(chat_id=chat_id).delete()
-        send_message(chat_id,
+        message = send_message(chat_id,
                      reply_to_message_id=message_id,
                      text="You've unsubscribed from vacancy updates.\n"
                           "You'll no longer get alerts about new vacancies available.\n"
                           "Send /setalert if you want to get them again."
                      )
     except:
-        pass
+        message = {}
+    return message
 
 
 # Create your views here.
@@ -111,28 +118,41 @@ class CommandReceiveView(View):
         return HttpResponse("Hello! This is @itvac_bot telegram bot!")
 
     def post(self, request):
-        data = json.loads(request.read().decode('utf-8'))
-        chat_id = data['message']['chat']['id']
-        # Get username (private chat). If not available get group title (group chat).
-        username = data['message']['chat'].get('username', data['message']['chat'].get('title'))
-        message = data['message']['text']
-        message_id = data['message']['message_id']
-        pattern = r'/\w+'
-        get_command = re.search(pattern, message)
         try:
-            command = get_command.group()
+            data = json.loads(request.read().decode('utf-8'))
+            chat_id = data['message']['chat']['id']
+            # Get username (private chat). If not available get group title (group chat).
+            username = data['message']['chat'].get('username', data['message']['chat'].get('title'))
+            message = data['message']['text']
+            message_id = data['message']['message_id']
+            pattern = r'/\w+'
+            get_command = re.search(pattern, message)
+            try:
+                command = get_command.group()
+            except:
+                command = None
+
+            if command == '/start':
+                start(chat_id, username)
+            elif command == '/vacancy':
+                vacancy(chat_id, message_id)
+            elif command == '/unsetalert':
+                unset_alert(chat_id, message_id)
+            elif command == '/setalert':
+                set_alert(chat_id, message_id, username)
+            elif command == '/help':
+                help(chat_id, message_id)
         except:
-            command = None
-
-        if command == '/start':
-            start(chat_id, username)
-        elif command == '/vacancy':
-            vacancy(chat_id, message_id)
-        elif command == '/unsetalert':
-            unset_alert(chat_id, message_id)
-        elif command == '/setalert':
-            set_alert(chat_id, message_id, username)
-        elif command == '/help':
-            help(chat_id, message_id)
-
-        return HttpResponse(status=200)
+            path = os.path.dirname(os.path.realpath(__file__))
+            with open(path + "/logs/caught_exceptions.log", 'a') as log:
+                current_time = datetime.now().strftime("%I:%M%p on %B %d, %Y")
+                tb = traceback.format_exc().replace('\n', ' ')
+                error_data = {
+                    'time': current_time,
+                    'request': json.loads(request.read().decode('utf-8')),
+                    'error': tb
+                }
+                json.dump(str(error_data) + ',', log, indent=4, ensure_ascii=False)
+        finally:
+            time.sleep(1)  # Wait a sec before end this request and start a new one
+            return HttpResponse(status=200)
