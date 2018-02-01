@@ -21,7 +21,8 @@ from bot_app.alert.message import send_message
 def start(chat_id, username):
     message = send_message(chat_id,
                             text="Hi! I'm IT Vacancies Bot.\n"
-                                 "I'll send you updates about new IT vacancies available on the web twice a day."
+                                 "I'll send you all new IT vacancies available on the web twice a day.\n"
+                                 "Send /vacancy to get a random vacancy from all available for the past week."
                             )
     try:
         # Create object if doesn't exist. Update username if changed.
@@ -92,6 +93,7 @@ def help(chat_id, message_id):
                                   "/unsetalert - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
                                   "/help - You'll get this help message.\n\n"
                                   "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
+                                  "*Join the channel:* @it_vacancies"
                                   "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot"
                  )
     return message
