@@ -59,7 +59,7 @@ def send_alert():
                                     "*Location: *" + vacancy['location'] + '\n'
                                     "*Salary: *" + vacancy['salary'] + '\n'
                                     "*Company: *" + vacancy['company'] + '\n'
-                                    "*Overview: *" + vacancy['overview'] + '\n\n'
+                                    "*Overview: *\n" + vacancy['overview'] + '\n\n'
                                     "" + vacancy['url'] + ' '
                              )
                 count -= 1
