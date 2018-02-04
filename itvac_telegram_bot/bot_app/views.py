@@ -23,7 +23,7 @@ def start(chat_id, username):
                             text="Hi! I'm IT Vacancies Bot.\n"
                                  "I'll send you all new IT vacancies available on the web twice a day.\n"
                                  "Send /vacancy to get a random vacancy from all available for the past week."
-                            )
+                           )
     try:
         # Create object if doesn't exist. Update username if changed.
         User.objects.update_or_create(chat_id=chat_id, defaults={'username': username})
@@ -41,10 +41,10 @@ def vacancy(chat_id, message_id):
     vac = get_random_vacancy()
     if len(vac) == 0:
         message = send_message(chat_id,
-                     reply_to_message_id=message_id,
-                     text="Sorry. No vacancies available for now...\n"
-                          "Please, try again later."
-                     )
+                                 reply_to_message_id=message_id,
+                                 text="Sorry. No vacancies available for now...\n"
+                                      "Please, try again later."
+                               )
     else:
         message = send_message(chat_id,
                      reply_to_message_id=message_id,
@@ -59,19 +59,21 @@ def vacancy(chat_id, message_id):
 
 
 def set_alert(chat_id, message_id, username):
+    # Prevents referenced before assignment error if there'll be error other than IntegrityError
+    message = {}
     try:
         Alert.objects.create(chat_id=chat_id)
         message = send_message(chat_id,
-                     reply_to_message_id=message_id,
-                     text="You've subscribed to vacancy updates.\n"
-                          "Now, you'll get all new vacancies available on the web twice a day."
-                     )
+                                 reply_to_message_id=message_id,
+                                 text="You've subscribed to vacancy updates.\n"
+                                      "Now, you'll get all new vacancies available on the web twice a day."
+                               )
     except IntegrityError:
         message = send_message(chat_id,
-                     reply_to_message_id=message_id,
-                     text="You already subscribed to vacancy updates.\n"
-                          "Send /unsetalert if you want to unsubscribe."
-                     )
+                                 reply_to_message_id=message_id,
+                                 text="You already subscribed to vacancy updates.\n"
+                                      "Send /unsetalert if you want to unsubscribe."
+                               )
     finally:
         try:
             User.objects.update_or_create(chat_id=chat_id, defaults={'username': username})
@@ -87,7 +89,7 @@ def help(chat_id, message_id):
                                   "*This bot connects to popular vacancy websites and parses all new IT vacancies available.\n"
                                   "So, you don't have to manually check websites every time.\n\n*"
                                   "Here are the control commands of the bot:\n"
-                                  "/start - Starts the bot and automatically subscribe you to the twice-daily vacancy updates.\n"
+                                  "/start - Starts the bot and automatically subscribes you to the twice-daily vacancy updates.\n"
                                   "/vacancy - Get a random vacancy from all available vacancies for the past week.\n"
                                   "/setalert - Subscribe to the twice-daily vacancy updates. So, you'll get all new vacancies available every 12 hours.\n"
                                   "/unsetalert - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
@@ -103,11 +105,11 @@ def unset_alert(chat_id, message_id):
     try:
         Alert.objects.filter(chat_id=chat_id).delete()
         message = send_message(chat_id,
-                     reply_to_message_id=message_id,
-                     text="You've unsubscribed from vacancy updates.\n"
-                          "You'll no longer get alerts about new vacancies available.\n"
-                          "Send /setalert if you want to get them again."
-                     )
+                                 reply_to_message_id=message_id,
+                                 text="You've unsubscribed from vacancy updates.\n"
+                                      "You'll no longer get alerts about new vacancies available.\n"
+                                      "Send /setalert if you want to get them again."
+                               )
     except:
         message = {}
     return message
@@ -154,13 +156,17 @@ class CommandReceiveView(View):
                 'error': tb
             }
             path = os.path.dirname(os.path.realpath(__file__))
-            with open(path + "/logs/caught_exceptions.log", 'r+') as log:
-                try:  # If file is not empty
-                    current_log = json.load(log)
-                    current_log.append(error_data)
-                    with open(path + "/logs/caught_exceptions.log", 'w+') as f:
-                        json.dump(current_log, f, indent=4, ensure_ascii=False)
-                except JSONDecodeError:  # If file is empty
+            try:
+                with open(path + "/logs/caught_exceptions.log", 'r+') as log:
+                    try:  # If file is not empty
+                        current_log = json.load(log)
+                        current_log.append(error_data)
+                        with open(path + "/logs/caught_exceptions.log", 'w+') as f:
+                            json.dump(current_log, f, indent=4, ensure_ascii=False)
+                    except JSONDecodeError:  # If file is empty
+                        json.dump([error_data], log, indent=4, ensure_ascii=False)
+            except FileNotFoundError:
+                with open(path + "/logs/caught_exceptions.log", 'w+') as log:
                     json.dump([error_data], log, indent=4, ensure_ascii=False)
         finally:
             time.sleep(1)  # Wait a sec before end this request and start a new one

@@ -27,7 +27,7 @@ def send_alert():
     # Compare old and new data. Get filtered new data.
     new_data = compare_data(data)
     if new_data:
-        # Saving all sent vacancies
+        # Saving last sent vacancies
         with open('last_sent_vacancies.json', 'w+') as outfile:
             json.dump(new_data, outfile, indent=4, ensure_ascii=False)
     # Sending vacancies
@@ -63,7 +63,7 @@ def send_alert():
                                     "" + vacancy['url'] + ' '
                              )
                 count -= 1
-                time.sleep(1) # Wait a sec before the next vacancy
+                time.sleep(1)  # Wait a sec before the next vacancy
 
 
 # Method for comparing new data to last sent
@@ -74,6 +74,7 @@ def compare_data(new_data):
         else:
             old_data = json.load(f)  # Get last sent vacancies
             for old_vacancy in old_data:
+                # TODO: Implement binary search algorithm here
                 if old_vacancy in new_data:
                     # Delete vacancy from data if the vacancy exists in last sent vacancies
                     new_data.pop(new_data.index(old_vacancy))

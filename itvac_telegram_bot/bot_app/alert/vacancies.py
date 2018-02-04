@@ -49,8 +49,7 @@ class __RabotaAz:
             soup = BeautifulSoup(page.content, 'lxml')
             data = {'results': []}
             try:
-                vacancies = soup.find('ul', {'class': 'visitor-vacancy-list'}).find_all('li')[
-                            ::-1]  # Newest vacancy comes last
+                vacancies = soup.find('ul', {'class': 'visitor-vacancy-list'}).find_all('li')
             except AttributeError:
                 return data['results']
             for vacancy in vacancies:
@@ -67,7 +66,7 @@ class __RabotaAz:
                         "company": company, "overview": overview, "url": url
                     }
                 )
-            return data['results']
+            return data['results'][::-1]  # Newest vacancy comes last
         else:
             return []
 
@@ -98,8 +97,7 @@ class __DayAz:
             soup = BeautifulSoup(page.content, 'lxml')
             data = {'results': []}
             try:
-                vacancies = soup.find('div', {'class': 'vacancy-serp'}).find_all('div', {'class': 'vacancy-serp-item'})[
-                            ::-1]  # Newest vacancy comes last
+                vacancies = soup.find('div', {'class': 'vacancy-serp'}).find_all('div', {'class': 'vacancy-serp-item'})
             except AttributeError:
                 return data['results']
             for vacancy in vacancies:
@@ -120,7 +118,7 @@ class __DayAz:
                         "company": company, "overview": overview, "url": url
                     }
                 )
-            return data['results']
+            return data['results'][::-1]  # Newest vacancy comes last
         else:
             return []
 
@@ -145,8 +143,8 @@ class __BossAz:
             soup = BeautifulSoup(page.content, 'lxml')
             data = {'results': []}
             try:
-                vacancies = soup.find_all('div', {'class': 'results-i'})[::-1]
-                if len(vacancies) >= count:
+                vacancies = soup.find_all('div', {'class': 'results-i'})
+                if len(vacancies) > count:
                     vacancies = vacancies[:count]
             except AttributeError:
                 return data['results']
@@ -163,7 +161,7 @@ class __BossAz:
                         "company": company, "overview": overview, "url": url
                     }
                 )
-            return data['results']
+            return data['results'][::-1]
         else:
             return []
 
