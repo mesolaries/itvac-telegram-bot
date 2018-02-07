@@ -38,17 +38,17 @@ def send_alert():
         count = len(new_data)
         if count == 0:
             send_message(chat_id=user,
-                         text="*There're no new vacancies for the last 12 hours.*"
+                         text="*There're no new vacancies for the last day.*"
                          )
         else:
             if count == 1:
                 send_message(chat_id=user,
-                             text="*There's 1 new vacancy for the last 12 hours!\n"
+                             text="*There's a new vacancy for the last day!\n"
                                   "I'm sending it to you now...*".format(count)
                              )
             else:
                 send_message(chat_id=user,
-                             text="*There're {} new vacancies for the last 12 hours!\n"
+                             text="*There're {} new vacancies for the last day!\n"
                                   "I'm sending them to you now...*".format(count)
                              )
             time.sleep(3)  # Wait 3 secs, then send vacancies

@@ -21,7 +21,7 @@ from bot_app.alert.message import send_message
 def start(chat_id, username):
     message = send_message(chat_id,
                             text="Hi! I'm IT Vacancies Bot.\n"
-                                 "I'll send you all new IT vacancies available on the web twice a day.\n"
+                                 "I'll send you all new IT vacancies available on the web once a day.\n"
                                  "Send /vacancy to get a random vacancy from all available for the past week."
                            )
     try:
@@ -66,7 +66,7 @@ def set_alert(chat_id, message_id, username):
         message = send_message(chat_id,
                                  reply_to_message_id=message_id,
                                  text="You've subscribed to vacancy updates.\n"
-                                      "Now, you'll get all new vacancies available on the web twice a day."
+                                      "Now, you'll get all new vacancies available on the web once a day."
                                )
     except IntegrityError:
         message = send_message(chat_id,
@@ -89,10 +89,10 @@ def help(chat_id, message_id):
                                   "*This bot connects to popular vacancy websites and parses all new IT vacancies available.\n"
                                   "So, you don't have to manually check websites every time.\n\n*"
                                   "Here are the control commands of the bot:\n"
-                                  "/start - Starts the bot and automatically subscribes you to the twice-daily vacancy updates.\n"
+                                  "/start - Starts the bot and automatically subscribes you to the daily vacancy updates.\n"
                                   "/vacancy - Get a random vacancy from all available vacancies for the past week.\n"
-                                  "/setalert - Subscribe to the twice-daily vacancy updates. So, you'll get all new vacancies available every 12 hours.\n"
-                                  "/unsetalert - Unsubscribe from twice-daily vacancy updates. You'll no longer get vacancy notifications.\n"
+                                  "/setalert - Subscribe to the daily vacancy updates. So, you'll get all new vacancies available every day.\n"
+                                  "/unsetalert - Unsubscribe from daily vacancy updates. You'll no longer get vacancy notifications.\n"
                                   "/help - You'll get this help message.\n\n"
                                   "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
                                   "*Join the channel:* [@it_vacancies](tg://user?id=@it_vacancies)\n"

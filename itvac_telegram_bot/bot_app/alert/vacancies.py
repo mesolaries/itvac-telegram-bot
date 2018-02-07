@@ -11,6 +11,8 @@ get_random_vacancy() method returns a random data from get_new_vacancies().
 import requests
 import random
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
+import pytz
 
 
 def get_new_vacancies():
@@ -22,14 +24,15 @@ def get_new_vacancies():
     return vacancies
 
 
-def get_random_vacancy():
+def get_random_vacancy(count=1):
     websites = [__RabotaAz, __DayAz, __BossAz]
     # Get a random website and parse vacancies from there
-    random_website = random.choice(websites)
-    random_website = random_website()
-    vacancies = [random_website.random()]
-    # Get random vacancy
-    random_vacancy = random.choice(vacancies)
+    random_website = random.choice(websites)  # class instance
+    random_website = random_website()  # reassign and initializing class
+    random_vacancy = random_website.random()  # calling random method of the class
+    if random_vacancy == {}:  # If no random vac, try again
+        if count < 5:  # preventing infinite recursion
+            return get_random_vacancy(count=count+1)
     return random_vacancy
 
 
@@ -74,7 +77,7 @@ class __RabotaAz:
         vacancies = self.vacancies(url=self.url_weekly)
         try:
             random_vacancy = random.choice(vacancies)
-        except IndexError:
+        except (IndexError, ValueError):
             random_vacancy = {}
         return random_vacancy
 
@@ -126,7 +129,7 @@ class __DayAz:
         vacancies = self.vacancies(url=self.url_weekly)
         try:
             random_vacancy = random.choice(vacancies)
-        except IndexError:
+        except (IndexError, ValueError):
             random_vacancy = {}
         return random_vacancy
 
@@ -134,18 +137,31 @@ class __DayAz:
 class __BossAz:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
     # No daily/weekly filter on website
-    url = "https://boss.az/vacancies?search%5Bcategory_id%5D=38"
-    base_url = "https://boss.az"
+    url = "https://en.boss.az/vacancies?search%5Bcategory_id%5D=38"
+    base_url = "https://en.boss.az"
 
-    def vacancies(self, url=url, count=2):  # count = How many vacancies to parse
+    def vacancies(self, url=url, offset=0):  # offset - vacancy post date period (e.g. 7 = for the past week, 0 - today)
         page = requests.get(url, headers={'User-agent': self.user_agent})
         if page.status_code == 200:
             soup = BeautifulSoup(page.content, 'lxml')
             data = {'results': []}
             try:
-                vacancies = soup.find_all('div', {'class': 'results-i'})
-                if len(vacancies) > count:
-                    vacancies = vacancies[:count]
+                now = datetime.now(pytz.timezone('Asia/Baku'))
+                today = now.date()
+                all_vacancies = soup.find_all('div', {'class': 'results-i'})
+                count = 0
+                for vac in all_vacancies:
+                    link = vac.find('a', {'class': 'results-i-link'}).get('href')
+                    inner_vac = requests.get(self.base_url + link, headers={'User-agent': self.user_agent})
+                    inner_soup = BeautifulSoup(inner_vac.content, 'lxml')
+                    vac_date = inner_soup.find('div', {'class': 'bumped_on params-i-val'}).get_text()
+                    vac_date = datetime.strptime(vac_date, "%B %d, %Y").date()
+                    #  Count vacancy if it's in a given time period (offset)
+                    if today <= vac_date + timedelta(days=offset):
+                        count += 1
+                    else:
+                        break
+                vacancies = all_vacancies[:count]
             except AttributeError:
                 return data['results']
             for vacancy in vacancies:
@@ -166,9 +182,9 @@ class __BossAz:
             return []
 
     def random(self):
-        vacancies = self.vacancies(url=self.url, count=14)
+        vacancies = self.vacancies(url=self.url, offset=7)
         try:
             random_vacancy = random.choice(vacancies)
-        except IndexError:
+        except (IndexError, ValueError):
             random_vacancy = {}
         return random_vacancy
