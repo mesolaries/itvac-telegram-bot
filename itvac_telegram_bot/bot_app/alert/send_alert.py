@@ -60,7 +60,7 @@ def send_alert():
                                      "*Company:* {company} \n"
                                      "*Location:* {location} \n"
                                      "*Salary:* {salary} \n"
-                                     "*Overview:* \n {overview} \n\n"
+                                     "*Overview:* \n{overview} \n\n"
                                      "{url} ".format(
                                          count=count,
                                          title=vacancy['title'],

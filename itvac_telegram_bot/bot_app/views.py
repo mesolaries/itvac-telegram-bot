@@ -53,7 +53,7 @@ def vacancy(chat_id, message_id):
                                        "*Company:* {company} \n"
                                        "*Location:* {location} \n"
                                        "*Salary:* {salary} \n"
-                                       "*Overview:* \n {overview} \n\n"
+                                       "*Overview:* \n{overview} \n\n"
                                        "{url} ".format(
                                            title=vac['title'],
                                            company=vac['company'],
