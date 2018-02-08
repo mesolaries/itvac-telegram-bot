@@ -54,13 +54,22 @@ def send_alert():
             time.sleep(3)  # Wait 3 secs, then send vacancies
             for vacancy in new_data:
                 send_message(chat_id=user,
-                             text="*Vacancy #" + str(count) + '*\n\n'
-                                    "*Job title: *" + vacancy['title'] + '\n'
-                                    "*Location: *" + vacancy['location'] + '\n'
-                                    "*Salary: *" + vacancy['salary'] + '\n'
-                                    "*Company: *" + vacancy['company'] + '\n'
-                                    "*Overview: *\n" + vacancy['overview'] + '\n\n'
-                                    "" + vacancy['url'] + ' '
+                             text=
+                                     "*Vacancy #{count}* \n\n"
+                                     "*Title:* {title} \n"
+                                     "*Company:* {company} \n"
+                                     "*Location:* {location} \n"
+                                     "*Salary:* {salary} \n"
+                                     "*Overview:* \n {overview} \n\n"
+                                     "{url} ".format(
+                                         count=count,
+                                         title=vacancy['title'],
+                                         company=vacancy['company'],
+                                         location=vacancy['location'],
+                                         salary=vacancy['salary'],
+                                         overview=vacancy['overview'],
+                                         url=vacancy['url']
+                                     )
                              )
                 count -= 1
                 time.sleep(1)  # Wait a sec before the next vacancy
@@ -68,7 +77,7 @@ def send_alert():
 
 # Method for comparing new data to last sent
 def compare_data(new_data):
-    with open('last_sent_vacancies.json', 'r+') as f:  # Opening file in w mode prevents error when file doesn't exist
+    with open('last_sent_vacancies.json', 'r+') as f:
         if not os.stat("last_sent_vacancies.json").st_size:
             return new_data
         else:

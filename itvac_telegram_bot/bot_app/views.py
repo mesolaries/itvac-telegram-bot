@@ -47,14 +47,22 @@ def vacancy(chat_id, message_id):
                                )
     else:
         message = send_message(chat_id,
-                     reply_to_message_id=message_id,
-                     text="*Job title: *" + vac['title'] + '\n'
-                            "*Location: *" + vac['location'] + '\n'
-                            "*Salary: *" + vac['salary'] + '\n'
-                            "*Company: *" + vac['company'] + '\n'
-                            "*Overview: *\n" + vac['overview'] + '\n\n'
-                            "" + vac['url'] + ' '
-                     )
+                                reply_to_message_id=message_id,
+                                text=
+                                       "*Title:* {title} \n"
+                                       "*Company:* {company} \n"
+                                       "*Location:* {location} \n"
+                                       "*Salary:* {salary} \n"
+                                       "*Overview:* \n {overview} \n\n"
+                                       "{url} ".format(
+                                           title=vac['title'],
+                                           company=vac['company'],
+                                           location=vac['location'],
+                                           salary=vac['salary'],
+                                           overview=vac['overview'],
+                                           url=vac['url']
+                                       )
+                               )
     return message
 
 
