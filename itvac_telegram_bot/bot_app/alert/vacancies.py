@@ -1,10 +1,10 @@
 """
-This module parses data from websites.
+This module scrapes data from websites.
 To add new website or edit existing one, create/edit __WebsiteName Class and its methods.
-You need to set new url to parse new website.
-Each website has its own structure. So, each website parsing is unique.
+You need to set new url to scrape new website.
+Each website has its own structure. So, each website scraping is unique.
 
-Use get_new_vacancies() method to get parsed data.
+Use get_new_vacancies() method to get scraped data.
 get_random_vacancy() method returns a random data from get_new_vacancies().
 """
 
@@ -26,7 +26,7 @@ def get_new_vacancies():
 
 def get_random_vacancy(count=1):
     websites = [__RabotaAz, __DayAz, __BossAz]
-    # Get a random website and parse vacancies from there
+    # Get a random website and scrape vacancies from there
     random_website = random.choice(websites)  # class instance
     random_website = random_website()  # reassign and initializing class
     random_vacancy = random_website.random()  # calling random method of the class
