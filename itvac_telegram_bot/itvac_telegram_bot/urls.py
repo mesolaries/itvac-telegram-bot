@@ -16,11 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
-from bot_app.views import CommandReceiveView
+from bot_app.views import CommandReceiveView, main
 
 token = settings.TOKEN
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(token+'/', CommandReceiveView.as_view()),
+    path('', main),
 ]
