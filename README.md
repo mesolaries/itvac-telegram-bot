@@ -14,6 +14,7 @@ The bot supports 3 popular vacancy websites for now.
 - [x] http://www.rabota.az/
 - [x] https://boss.az/
 - [x] https://jobs.day.az/
+
 **TODO**
 - [ ] http://jobsearch.az/
 
