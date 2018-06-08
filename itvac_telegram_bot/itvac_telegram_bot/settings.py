@@ -27,7 +27,7 @@ TOKEN = os.environ.get('TOKEN')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['bot.emilmanafov.com']
+ALLOWED_HOSTS = []  # Add your hosts in production
 
 
 # Application definition
