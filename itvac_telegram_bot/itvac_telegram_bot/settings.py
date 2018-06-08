@@ -130,3 +130,10 @@ try:
     from .local_settings import *
 except ImportError:
     pass
+
+# Use production_settings if exist
+
+try:
+    from .production_settings import *
+except ImportError:
+    pass
