@@ -16,14 +16,48 @@ from bot_app.models import User, Alert
 from bot_app.alert.vacancies import get_random_vacancy
 from bot_app.alert.message import send_message
 
+# Bot's text messages
+
+start_message = ("Hi! I'm IT Vacancies Bot.\n"
+                "I'll send you all new IT vacancies available on the web once a day.\n"
+                "Send /vacancy to get a random vacancy from all available for the past week.")
+
+no_vacancy_message = ("Sorry. No vacancies available for now...\n"
+                        "Please, try again later.")
+
+vacancy_message = ("*Title:* {title} \n"
+                    "*Company:* {company} \n"
+                    "*Location:* {location} \n"
+                    "*Salary:* {salary} \n"
+                    "*Overview:* \n{overview} \n\n"
+                    "{url} ")
+
+subscribed_message = ("You've subscribed to vacancy updates.\n"
+                        "Now, you'll get all new vacancies available on the web once a day.")
+
+already_subscribed_message = ("You've already subscribed to vacancy updates.\n"
+                                "Send /unsetalert if you want to unsubscribe.")
+
+unset_alert_message = ("You've unsubscribed from vacancy updates.\n"
+                        "You'll no longer get alerts about new vacancies available.\n"
+                        "Send /setalert if you want to get them again.")
+
+help_message = ("*How to use IT Vacancies bot?\n\n*"
+                "*This bot connects to popular vacancy websites and scrapes all new IT vacancies available.\n"
+                "So, you don't have to manually check websites every time.\n\n*"
+                "Here are the control commands of the bot:\n"
+                "/start - Starts the bot and automatically subscribes you to the daily vacancy updates.\n"
+                "/vacancy - Get a random vacancy from all available vacancies for the past week.\n"
+                "/setalert - Subscribe to the daily vacancy updates. So, you'll get all new vacancies available every day.\n"
+                "/unsetalert - Unsubscribe from daily vacancy updates. You'll no longer get vacancy notifications.\n"
+                "/help - You'll get this help message.\n\n"
+                "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
+                "*Join the channel:* [@it_vacancies](tg://user?id=@it_vacancies)\n"
+                "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot")
 
 # Add your handlers here
 def start(chat_id, username):
-    message = send_message(chat_id,
-                            text="Hi! I'm IT Vacancies Bot.\n"
-                                 "I'll send you all new IT vacancies available on the web once a day.\n"
-                                 "Send /vacancy to get a random vacancy from all available for the past week."
-                           )
+    message = send_message(chat_id, text=start_message)
     try:
         # Create object if doesn't exist. Update username if changed.
         User.objects.update_or_create(chat_id=chat_id, defaults={'username': username})
@@ -42,26 +76,19 @@ def vacancy(chat_id, message_id):
     if len(vac) == 0:
         message = send_message(chat_id,
                                  reply_to_message_id=message_id,
-                                 text="Sorry. No vacancies available for now...\n"
-                                      "Please, try again later."
+                                 text=no_vacancy_message
                                )
     else:
         message = send_message(chat_id,
                                 reply_to_message_id=message_id,
-                                text=
-                                       "*Title:* {title} \n"
-                                       "*Company:* {company} \n"
-                                       "*Location:* {location} \n"
-                                       "*Salary:* {salary} \n"
-                                       "*Overview:* \n{overview} \n\n"
-                                       "{url} ".format(
-                                           title=vac['title'],
-                                           company=vac['company'],
-                                           location=vac['location'],
-                                           salary=vac['salary'],
-                                           overview=vac['overview'],
-                                           url=vac['url']
-                                       )
+                                text=vacancy_message.format(
+                                                            title=vac['title'],
+                                                            company=vac['company'],
+                                                            location=vac['location'],
+                                                            salary=vac['salary'],
+                                                            overview=vac['overview'],
+                                                            url=vac['url']
+                                                        )
                                )
     return message
 
@@ -73,14 +100,12 @@ def set_alert(chat_id, message_id, username):
         Alert.objects.create(chat_id=chat_id)
         message = send_message(chat_id,
                                  reply_to_message_id=message_id,
-                                 text="You've subscribed to vacancy updates.\n"
-                                      "Now, you'll get all new vacancies available on the web once a day."
+                                 text=subscribed_message
                                )
     except IntegrityError:
         message = send_message(chat_id,
                                  reply_to_message_id=message_id,
-                                 text="You already subscribed to vacancy updates.\n"
-                                      "Send /unsetalert if you want to unsubscribe."
+                                 text=already_subscribed_message
                                )
     finally:
         try:
@@ -93,18 +118,7 @@ def set_alert(chat_id, message_id, username):
 def help(chat_id, message_id):
     message = send_message(chat_id=chat_id,
                              reply_to_message_id=message_id,
-                             text="*How to use IT Vacancies bot?\n\n*"
-                                  "*This bot connects to popular vacancy websites and parses all new IT vacancies available.\n"
-                                  "So, you don't have to manually check websites every time.\n\n*"
-                                  "Here are the control commands of the bot:\n"
-                                  "/start - Starts the bot and automatically subscribes you to the daily vacancy updates.\n"
-                                  "/vacancy - Get a random vacancy from all available vacancies for the past week.\n"
-                                  "/setalert - Subscribe to the daily vacancy updates. So, you'll get all new vacancies available every day.\n"
-                                  "/unsetalert - Unsubscribe from daily vacancy updates. You'll no longer get vacancy notifications.\n"
-                                  "/help - You'll get this help message.\n\n"
-                                  "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
-                                  "*Join the channel:* [@it_vacancies](tg://user?id=@it_vacancies)\n"
-                                  "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot"
+                             text=help_message
                  )
     return message
 
@@ -114,9 +128,7 @@ def unset_alert(chat_id, message_id):
         Alert.objects.filter(chat_id=chat_id).delete()
         message = send_message(chat_id,
                                  reply_to_message_id=message_id,
-                                 text="You've unsubscribed from vacancy updates.\n"
-                                      "You'll no longer get alerts about new vacancies available.\n"
-                                      "Send /setalert if you want to get them again."
+                                 text=unset_alert_message
                                )
     except:
         message = {}
@@ -128,7 +140,7 @@ def unset_alert(chat_id, message_id):
 @method_decorator(csrf_exempt, name='dispatch')
 class CommandReceiveView(View):
     def get(self, request):
-        return HttpResponse("Hello! This is @itvac_bot telegram bot!")
+        return HttpResponse(status=200)
 
     def post(self, request):
         try:
@@ -179,3 +191,10 @@ class CommandReceiveView(View):
         finally:
             time.sleep(1)  # Wait a sec before end this request and start a new one
             return HttpResponse(status=200)
+
+# Main page views
+
+def main(request):
+    body_html = ("<h1 style='font-family:verdana;'>Hello! This is IT Vacancies Bot "
+                "(<a href='https://t.me/itvac_bot'>@itvac_bot</a>)</h1>")
+    return HttpResponse(body_html, status=200)
