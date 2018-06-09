@@ -35,7 +35,7 @@ vacancy_message = ("*Vacancy #{count}* \n\n"
                     "*Company:* {company} \n"
                     "*Location:* {location} \n"
                     "*Salary:* {salary} \n"
-                    "*Overview:* \n{overview} \n\n"
+                    "*Short description:* \n{overview} \n\n"
                     "{url} ")
 
 
