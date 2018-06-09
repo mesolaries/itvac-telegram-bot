@@ -137,8 +137,9 @@ class __DayAz:
 class __BossAz:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
     # No daily/weekly filter on website
-    url = "https://boss.az/vacancies?search%5Bcategory_id%5D=38"
-    base_url = "https://boss.az"
+    url = "https://en.boss.az/vacancies?search%5Bcategory_id%5D=38"
+    base_url = "https://en.boss.az"  # Using english version of site to get date in right format
+    base_url_az = "https://boss.az"
 
     def vacancies(self, url=url, offset=0):  # offset - vacancy post date period (e.g. 7 = for the past week, 0 - today)
         page = requests.get(url, headers={'User-agent': self.user_agent})
@@ -170,7 +171,7 @@ class __BossAz:
                 location = str(vacancy.find('div', {'class': 'results-i-secondary'}).contents[0])
                 company = vacancy.find('a', {'class': 'results-i-company'}).get_text()
                 overview = vacancy.find('div', {'class': 'results-i-summary'}).p.get_text()
-                url = self.base_url + vacancy.find('a', {'class': 'results-i-link'}).get('href')
+                url = self.base_url_az + vacancy.find('a', {'class': 'results-i-link'}).get('href')  # Send user AZ version of site
                 data['results'].append(
                     {
                         "title": title, "salary": salary, "location": location,
