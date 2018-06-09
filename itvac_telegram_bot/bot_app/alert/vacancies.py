@@ -58,6 +58,8 @@ class __RabotaAz:
             for vacancy in vacancies:
                 title = vacancy.find('a', {'class': 'title-'}).h2.get_text()
                 salary = vacancy.find('b', {'class': 'salary-'}).get_text()
+                if salary == "Əmək haqqı müsahibə əsasında":
+                    salary = "Not specified"
                 location = vacancy.find('b', {'class': 'address-'}).get_text()
                 company = vacancy.find('span', {'class': 'company-'}).b.get_text()
                 overview = vacancy.find_all('p')[-1].get_text()  # Overview is in the last <p>
@@ -108,7 +110,7 @@ class __DayAz:
                 try:
                     salary = vacancy.find('div', {'data-qa': 'vacancy-serp__vacancy-compensation'}).get_text()
                 except:
-                    salary = "-"
+                    salary = "Not specified"
                 location = vacancy.find('span', {'data-qa': 'vacancy-serp__vacancy-address'}).get_text()
                 company = vacancy.find('a', {'data-qa': 'vacancy-serp__vacancy-employer'}).get_text()
                 requirements = vacancy.find('div', {'data-qa': 'vacancy-serp__vacancy_snippet_requirement'}).get_text()
@@ -168,6 +170,8 @@ class __BossAz:
             for vacancy in vacancies:
                 title = vacancy.h3.get_text()
                 salary = vacancy.find('div', {'class': 'results-i-salary'}).get_text()
+                if salary == "—" or salary == "-":
+                    salary = "Not specified"
                 location = str(vacancy.find('div', {'class': 'results-i-secondary'}).contents[0])
                 company = vacancy.find('a', {'class': 'results-i-company'}).get_text()
                 overview = vacancy.find('div', {'class': 'results-i-summary'}).p.get_text()
