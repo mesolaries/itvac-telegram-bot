@@ -19,11 +19,11 @@ The bot supports 3 popular vacancy websites for now.
 - [ ] http://jobsearch.az/
 
 ## How you can use this repo?
-You can easily use this repo to scrape any data from any website and send scraped data to users.
+You can easily use this repo to scrape any data from any website and send parsed data to users.
 
 You just need to change URLs and Class names in `vacancies.py` file.
 
-Then, scrape data in `vacancies()` method using [BeautifulSoup4](https://pypi.python.org/pypi/beautifulsoup4).
+Then, parse data in `vacancies()` method using [BeautifulSoup4](https://pypi.python.org/pypi/beautifulsoup4).
 
 ___
 
