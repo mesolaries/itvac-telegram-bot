@@ -86,7 +86,7 @@ class __DayAz:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
     url_daily = "https://jobs.day.az/catalog/Informacionnye-tehnologii-Internet-Telekom?search_period=1&specialization=1"
     url_weekly = "https://jobs.day.az/catalog/Informacionnye-tehnologii-Internet-Telekom?search_period=7&specialization=1"
-    base_url = "https://jobs.day.az/locale?language=EN"  # Get website in english
+    base_url = "https://jobs.day.az/locale?language=AZ"  # Get website in azerbaijani
 
     def vacancies(self, url=url_daily):
         session = requests.Session()
@@ -137,8 +137,8 @@ class __DayAz:
 class __BossAz:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
     # No daily/weekly filter on website
-    url = "https://en.boss.az/vacancies?search%5Bcategory_id%5D=38"
-    base_url = "https://en.boss.az"
+    url = "https://boss.az/vacancies?search%5Bcategory_id%5D=38"
+    base_url = "https://boss.az"
 
     def vacancies(self, url=url, offset=0):  # offset - vacancy post date period (e.g. 7 = for the past week, 0 - today)
         page = requests.get(url, headers={'User-agent': self.user_agent})
