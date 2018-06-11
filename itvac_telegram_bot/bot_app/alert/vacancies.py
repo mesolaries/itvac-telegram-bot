@@ -139,7 +139,7 @@ class __DayAz:
 class __BossAz:
     user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
     # No daily/weekly filter on website
-    url = "https://en.boss.az/vacancies?search%5Bcategory_id%5D=38"
+    url = "https://boss.az/vacancies?search%5Bcategory_id%5D=38"
     base_url = "https://en.boss.az"  # Using english version of site to get date in right format
     base_url_az = "https://boss.az"
 
