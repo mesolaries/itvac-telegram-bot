@@ -1,6 +1,7 @@
 # from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
@@ -52,7 +53,7 @@ help_message = ("*How to use IT Vacancies bot?\n\n*"
                 "/unsetalert - Unsubscribe from daily vacancy updates. You'll no longer get vacancy notifications.\n"
                 "/help - You'll get this help message.\n\n"
                 "_Note: This bot only works with Azerbaijan vacancy websites._\n\n"
-                "*Join the channel:* [@it_vacancies](tg://user?id=@it_vacancies)\n"
+                "*Join the channel:* [@it_vakansiyalar](tg://user?id=@it_vakansiyalar)\n"
                 "*GitHub repo:* https://github.com/mesolaries/itvac-telegram-bot")
 
 # Add your handlers here
@@ -193,8 +194,7 @@ class CommandReceiveView(View):
             return HttpResponse(status=200)
 
 # Main page views
+# Redirects to bot chat
 
 def main(request):
-    body_html = ("<h1 style='font-family:verdana;'>Hello! This is IT Vacancies Bot "
-                "(<a href='https://t.me/itvac_bot'>@itvac_bot</a>)</h1>")
-    return HttpResponse(body_html, status=200)
+    return redirect("https://t.me/itvac_bot")

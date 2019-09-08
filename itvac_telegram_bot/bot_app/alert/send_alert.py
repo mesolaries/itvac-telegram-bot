@@ -22,13 +22,13 @@ import time
 
 first_message = "*Hey! This is a job alert!*"
 
-no_vacancies_message = "*There're no new vacancies for the last day.*"
+no_vacancies_message = "There're no new vacancies for the last day."
 
-single_vacancy_warning_message = ("*There's a new vacancy for the last day!\n"
-                                    "I'm sending it to you now...*")
+single_vacancy_warning_message = ("There's a new vacancy for the last day!\n"
+                                    "I'm sending it to you now...")
 
-plural_vacancy_warning_message = ("*There're {} new vacancies for the last day!\n"
-                                    "I'm sending them to you now...*")
+plural_vacancy_warning_message = ("There're {} new vacancies for the last day!\n"
+                                    "I'm sending them to you now...")
 
 vacancy_message = ("*Vacancy #{count}* \n\n"
                     "*Title:* {title} \n"

@@ -19,13 +19,14 @@ def get_new_vacancies():
     rabota_az = __RabotaAz()
     day_az = __DayAz()
     boss_az = __BossAz()
+    azerjobs_com = __AzerjobsCom()
     # Sum of all vacancies available
-    vacancies = rabota_az.vacancies() + day_az.vacancies() + boss_az.vacancies()
+    vacancies = rabota_az.vacancies() + day_az.vacancies() + boss_az.vacancies() + azerjobs_com.vacancies()
     return vacancies
 
 
 def get_random_vacancy(count=1):
-    websites = [__RabotaAz, __DayAz, __BossAz]
+    websites = [__RabotaAz, __DayAz, __BossAz, __AzerjobsCom]
     # Get a random website and scrape vacancies from there
     random_website = random.choice(websites)  # class instance
     random_website = random_website()  # reassign and initializing class
@@ -188,6 +189,75 @@ class __BossAz:
 
     def random(self):
         vacancies = self.vacancies(url=self.url, offset=7)
+        try:
+            random_vacancy = random.choice(vacancies)
+        except (IndexError, ValueError):
+            random_vacancy = {}
+        return random_vacancy
+
+
+class __AzerjobsCom:
+    user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.119 Safari/537.36"
+    url_daily = "https://www.azerjobs.com/search-posting?type=1&category=13&published=0"
+    url_weekly = "https://www.azerjobs.com/search-posting?type=1&category=13&published=7"
+    base_url = "https://www.azerjobs.com"  
+    url_set_lang = "https://www.azerjobs.com/set-language/az" # Get website in azerbaijani
+
+    def vacancies(self, url=url_daily):
+        session = requests.Session()
+        session.get(self.base_url, headers={'User-agent': self.user_agent})
+        session.get(self.url_set_lang, headers={'User-agent': self.user_agent})
+        page = session.get(url, headers={'User-agent': self.user_agent})
+        if page.status_code == 200:
+            soup = BeautifulSoup(page.content, 'lxml')
+            data = {'results': []}
+            vacancy_links = []
+            try:
+                vacancies = soup.find_all('table', {'class': 'vacanc'})[1].find('tbody').find_all('tr')
+                for vacancy in vacancies:
+                    link = vacancy.find('a', {'class': 'title'}).get('href')
+                    vacancy_links.append(link)
+            except AttributeError:
+                return data['results']
+            for link in vacancy_links:
+                vac_page = session.get(self.base_url + link, headers={'User-agent': self.user_agent})
+                if vac_page.status_code == 200:
+                    soup = BeautifulSoup(vac_page.content, 'lxml')
+                    vacancy = soup.find('div', {'class', 'anncmt-block'})
+                    title = vacancy.find('div', {'class': 'anncmt-title'}).h1.get_text()
+                    details = vacancy.find('div', {'class': 'posting-details'}).find_all('table', {'class': 'firm-card'})
+                    for detail_group in details:
+                        detail_group_items = detail_group.find_all('tr')
+                        for detail in detail_group_items:
+                            option = detail.find('strong')
+                            if option == None:
+                                continue
+                            option_text = option.get_text().strip()
+                            if option_text == "Əmək haqqı:":
+                                salary = option.next_sibling.strip()
+                            elif option_text == "Yerləşmə:":
+                                location = option.find_next_sibling().get_text().strip() 
+                    if 'salary' not in locals():
+                        salary = 'Not specified'
+                    company = vacancy.find('div', {'class': 'anncmt-customer'}).h2.a.get_text().strip()
+                    overview = vacancy.find('div', {'class': 'firm-descr'}).find_all('ul')[0].get_text().strip()
+                    overview = overview[:435] + "..."
+                    url = self.base_url + link
+                    data['results'].append(
+                        {
+                            "title": title, "salary": salary, "location": location,
+                            "company": company, "overview": overview, "url": url
+                        }
+                    )
+                else:
+                    pass
+            return data['results'][::-1]  # Newest vacancy comes last
+        else:
+            return []
+
+    def random(self):
+        vacancies = self.vacancies(url=self.url_weekly)
+        print(vacancies)
         try:
             random_vacancy = random.choice(vacancies)
         except (IndexError, ValueError):
