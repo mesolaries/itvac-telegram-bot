@@ -217,7 +217,7 @@ class __AzerjobsCom:
                 for vacancy in vacancies:
                     link = vacancy.find('a', {'class': 'title'}).get('href')
                     vacancy_links.append(link)
-            except AttributeError:
+            except (AttributeError, IndexError):
                 return data['results']
             for link in vacancy_links:
                 vac_page = session.get(self.base_url + link, headers={'User-agent': self.user_agent})
