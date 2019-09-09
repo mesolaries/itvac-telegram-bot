@@ -213,11 +213,14 @@ class __AzerjobsCom:
             data = {'results': []}
             vacancy_links = []
             try:
-                vacancies = soup.find_all('table', {'class': 'vacanc'})[1].find('tbody').find_all('tr')
+            	try:
+                	vacancies = soup.find_all('table', {'class': 'vacanc'})[1].find('tbody').find_all('tr')
+                except IndexError:
+                	vacancies = soup.find_all('table', {'class': 'vacanc'})[0].find('tbody').find_all('tr')
                 for vacancy in vacancies:
                     link = vacancy.find('a', {'class': 'title'}).get('href')
                     vacancy_links.append(link)
-            except (AttributeError, IndexError):
+            except AttributeError:
                 return data['results']
             for link in vacancy_links:
                 vac_page = session.get(self.base_url + link, headers={'User-agent': self.user_agent})
