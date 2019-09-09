@@ -217,9 +217,10 @@ class __AzerjobsCom:
                 	vacancies = soup.find_all('table', {'class': 'vacanc'})[1].find('tbody').find_all('tr')
                 except IndexError:
                 	vacancies = soup.find_all('table', {'class': 'vacanc'})[0].find('tbody').find_all('tr')
-                for vacancy in vacancies:
-                    link = vacancy.find('a', {'class': 'title'}).get('href')
-                    vacancy_links.append(link)
+                finally:
+                    for vacancy in vacancies:
+                        link = vacancy.find('a', {'class': 'title'}).get('href')
+                        vacancy_links.append(link)
             except AttributeError:
                 return data['results']
             for link in vacancy_links:
