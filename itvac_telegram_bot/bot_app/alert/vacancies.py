@@ -239,18 +239,18 @@ class __AzerjobsCom:
             data = {'results': []}
             vacancy_links = []
             try:
-                try:
-                    vacancies = soup.find_all('table', {'class': 'vacanc'})[
+                vacancy_list = soup.find_all('table', {'class': 'vacanc'})
+                if len(vacancy_list) > 1:
+                    vacancies = vacancy_list[
                         1].find('tbody').find_all('tr')
-                except IndexError:
-                    vacancies = soup.find_all('table', {'class': 'vacanc'})[
+                else:
+                    vacancies = vacancy_list[
                         0].find('tbody').find_all('tr')
-                finally:
-                    for vacancy in vacancies:
-                        link = vacancy.find(
-                            'a', {'class': 'title'}).get('href')
-                        vacancy_links.append(link)
-            except AttributeError:
+                for vacancy in vacancies:
+                    link = vacancy.find(
+                        'a', {'class': 'title'}).get('href')
+                    vacancy_links.append(link)
+            except (AttributeError, IndexError):
                 return data['results']
             for link in vacancy_links:
                 vac_page = session.get(
@@ -295,7 +295,6 @@ class __AzerjobsCom:
 
     def random(self):
         vacancies = self.vacancies(url=self.url_weekly)
-        print(vacancies)
         try:
             random_vacancy = random.choice(vacancies)
         except (IndexError, ValueError):
